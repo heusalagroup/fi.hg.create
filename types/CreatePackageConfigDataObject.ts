@@ -20,7 +20,21 @@ export interface CreatePackageConfigDataObject {
     readonly mainSourceFileTemplate ?: string;
     readonly gitCommitMessage       ?: string;
     readonly gitBranch              ?: string;
+
+    /**
+     * Files to copy from template directory
+     *
+     * See also renameFiles
+     */
     readonly files                  ?: readonly string[];
+
+    /**
+     * Rename files to different names on the target.
+     *
+     * This is to overcome files like .gitignore which do not exist in NPM packages.
+     */
+    readonly renameFiles            ?: {readonly [key: string]: string};
+
     readonly packages               ?: readonly string[];
     readonly gitSubmodules          ?: readonly GitSubmoduleConfig[];
 

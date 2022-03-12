@@ -36,6 +36,7 @@ export class CreatePackageConfig {
     private _mainSrcFileTemplate    : string | undefined;
     private _mainSrcFileName        : string | undefined;
     private _files                  : readonly string[];
+    private _renameFiles            : {readonly [key: string]: string};
     private _gitSubmodules          : readonly GitSubmoduleConfig[];
     private _packages               : readonly string[];
     private _packageJsonModifier    : PackageJsonModifyCallback;
@@ -61,6 +62,7 @@ export class CreatePackageConfig {
         config.setBuildDir(configData?.buildDir ?? './dist');
         config.setMainSourceFileTemplate(configData?.mainSourceFileTemplate ?? "./src/run.ts");
         config.setFiles( configData?.files ?? [] );
+        config.setRenameFiles( configData?.renameFiles ?? {} );
         config.setGitSubmodules( configData?.gitSubmodules ?? [] );
         config.setPackages( configData?.packages ?? [] );
         config.setGitCommitMessage( configData?.gitCommitMessage ?? 'first commit');
@@ -257,6 +259,16 @@ export class CreatePackageConfig {
 
     public getFiles () : readonly string[] {
         return this._files;
+    }
+
+
+    public setRenameFiles (value : {readonly [key: string]: string}) : CreatePackageConfig {
+        this._renameFiles = value;
+        return this;
+    }
+
+    public getRenameFiles () : {readonly [key: string]: string} {
+        return this._renameFiles;
     }
 
 

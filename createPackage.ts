@@ -10,7 +10,7 @@ import { InstallConfig } from "pkg-install/lib/config";
 import { PackageManagerType, parsePackageManagerType } from "./types/PackageManagerType";
 import { getPackageManager, install } from "pkg-install";
 import { initPackage } from "./initPackage";
-import { camelCase, isEqual, map, reduce, uniq } from "../core/modules/lodash";
+import { camelCase, has, isEqual, map, reduce, uniq } from "../core/modules/lodash";
 import { GitUtils } from "./GitUtils";
 import { isReadonlyJsonObject } from "../core/Json";
 import { LogService } from "../core/LogService";
@@ -79,8 +79,15 @@ export async function createPackage (
     };
 
     const files = config.getFiles();
+    const renameFiles = config.getRenameFiles();
 
-    const directories = uniq(map(files, (file: string) => pathDirname(file)));
+    const directories = uniq(map(files, (item: string) => {
+        let targetItem = item;
+        if (has(renameFiles, item)) {
+            targetItem = renameFiles[item];
+        }
+        return pathDirname(targetItem);
+    }));
 
     const templatesDir = config.getTemplatesDirectory();
 
@@ -97,11 +104,18 @@ export async function createPackage (
 
     // Copy files
     files.forEach((item: string) => {
+
+        let targetItem = item;
+        if (has(renameFiles, item)) {
+            targetItem = renameFiles[item];
+        }
+
         SyncFileUtils.copyTextFileWithReplacementsIfMissing(
             pathResolve(templatesDir, item),
-            pathResolve(pkgDir, item),
+            pathResolve(pkgDir, targetItem),
             replacements
         );
+
     });
 
     SyncFileUtils.copyTextFileWithReplacementsIfMissing(
