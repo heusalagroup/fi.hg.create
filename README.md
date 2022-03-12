@@ -10,3 +10,9 @@ Using [`hgm`](https://github.com/heusalagroup/hgm):
 hgm i fi.hg.core
 hgm i fi.hg.create
 ```
+
+Required dependencies:
+
+```shell
+npm i execa @types/execa pkg-install @types/pkg-install lodash @types/lodash
+```
