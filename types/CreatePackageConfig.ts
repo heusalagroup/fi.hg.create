@@ -1,6 +1,11 @@
 // Copyright (c) 2022. Heusala Group Oy <info@heusalagroup.fi>. All rights reserved.
 
-import { basename as pathBasename, join as pathJoin, resolve as pathResolve } from "path";
+import {
+    basename as pathBasename,
+    dirname as pathDirname,
+    join as pathJoin,
+    resolve as pathResolve
+} from "path";
 import { map } from "../../core/modules/lodash";
 import { ReadonlyJsonObject } from "../../core/Json";
 import { PackageManagerType, parsePackageManagerType } from "./PackageManagerType";
@@ -36,6 +41,15 @@ export class CreatePackageConfig {
     private _packageJsonModifier    : PackageJsonModifyCallback;
 
     public constructor () {
+    }
+
+    public static createFromTemplateFile (templateConfigFile : string) : CreatePackageConfig {
+        const templateConfigDir : string = pathDirname(templateConfigFile);
+        const configData : CreatePackageConfigDataObject = require(templateConfigFile);
+        const config = CreatePackageConfig.createFromDataObject(configData);
+        config.setTemplatesDirectory(pathResolve(templateConfigDir, configData?.templatesDir ?? "./templates"));
+
+        return config;
     }
 
     public static createFromDataObject (configData: CreatePackageConfigDataObject) : CreatePackageConfig {
