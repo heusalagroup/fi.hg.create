@@ -48,7 +48,6 @@ export class CreatePackageConfig {
         const configData : CreatePackageConfigDataObject = require(templateConfigFile);
         const config = CreatePackageConfig.createFromDataObject(configData);
         config.setTemplatesDirectory(pathResolve(templateConfigDir, configData?.templatesDir ?? "./templates"));
-
         return config;
     }
 
