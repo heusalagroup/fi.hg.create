@@ -11,7 +11,12 @@ hgm i fi.hg.core
 hgm i fi.hg.create
 ```
 
+### Required dependencies
+
+```shell
+npm i execa @types/execa pkg-install @types/pkg-install lodash @types/lodash
+```
+
 ### License
 
 Copyright (c) Heusala Group. All rights reserved. Licensed under the MIT License (the "[License](./LICENSE)");
-
