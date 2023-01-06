@@ -1,12 +1,10 @@
 // Copyright (c) 2022. Heusala Group Oy <info@heusalagroup.fi>. All rights reserved.
 
 import { GitSubmoduleConfig, isGitSubmoduleConfig } from "./GitSubmoduleConfig";
-import {
-    hasNoOtherKeys,
-    isArrayOfOrUndefined,
-    isRegularObject,
-    isString
-} from "../../core/modules/lodash";
+import { isString } from "../../core/types/String";
+import { isRegularObject } from "../../core/types/RegularObject";
+import { hasNoOtherKeys } from "../../core/types/OtherKeys";
+import { isArrayOfOrUndefined } from "../../core/types/Array";
 
 export interface CreatePackageConfigDataObject {
 

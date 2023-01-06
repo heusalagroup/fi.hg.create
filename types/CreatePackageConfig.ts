@@ -6,7 +6,7 @@ import {
     join as pathJoin,
     resolve as pathResolve
 } from "path";
-import { map } from "../../core/modules/lodash";
+import { map } from "../../core/functions/map";
 import { ReadonlyJsonObject } from "../../core/Json";
 import { PackageManagerType, parsePackageManagerType } from "./PackageManagerType";
 import { GitSubmoduleConfig } from "./GitSubmoduleConfig";

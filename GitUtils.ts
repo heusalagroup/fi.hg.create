@@ -7,7 +7,7 @@ import {
 import { execa } from "execa";
 import { SyncFileUtils } from "../core/SyncFileUtils";
 import { LogService } from "../core/LogService";
-import { isString } from "../core/modules/lodash";
+import { isString } from "../core/types/String";
 
 const LOG = LogService.createLogger('GitUtils');
 
