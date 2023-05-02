@@ -1,3 +1,5 @@
+**Join our [Discord](https://discord.gg/UBTrHxA78f) to discuss about our software!**
+
 # @heusalagroup/fi.hg.create
 
 Sub module for [project templates](https://hg.fi/#project-templates).
