@@ -55,7 +55,10 @@ export async function createPackage (
     };
 
     LOG.debug(`Initial install config: `, installConfig);
-    const pkgManager: PackageManagerType = parsePackageManagerType( await getPackageManager(installConfig) );
+    const pkgManager: PackageManagerType | undefined = parsePackageManagerType( await getPackageManager(installConfig) );
+    if (!pkgManager) {
+        throw new TypeError(`Failed to initialize pkgManager: ${pkgManager}`);
+    }
 
     LOG.debug(`Initializing package.json using `, pkgManager);
     await initPackage(pkgManager);
@@ -70,14 +73,22 @@ export async function createPackage (
     config.setPackageDirectory( pathDirname(packageJsonPath) );
 
     const pkgDir = config.getPackageDirectory();
+    if (!pkgDir) throw new TypeError(`Failed to read pkgDir: ${pkgDir}`);
     const mainName = config.getMainName();
 
     const currentYear = (new Date().getFullYear());
 
-    const replacements = {
-        'GIT-ORGANISATION': config.getGitOrganization(),
-        'ORGANISATION-NAME': config.getOrganizationName(),
-        'ORGANISATION-EMAIL': config.getOrganizationEmail(),
+    const gitOrganization = config.getGitOrganization();
+    if (!gitOrganization) throw new TypeError(`Failed to read git organization`);
+    const gitOrganizationName = config.getOrganizationName();
+    if (!gitOrganizationName) throw new TypeError(`Failed to read git organization name`);
+    const gitOrganizationEmail = config.getOrganizationEmail();
+    if (!gitOrganizationEmail) throw new TypeError(`Failed to read git organization email`);
+
+    const replacements : {readonly [name: string]: string} = {
+        'GIT-ORGANISATION': gitOrganization,
+        'ORGANISATION-NAME': gitOrganizationName,
+        'ORGANISATION-EMAIL': gitOrganizationEmail,
         'CURRENT-YEAR': `${currentYear}`,
         'PROJECT-NAME': mainName,
         'projectName': camelCase(mainName)
@@ -95,6 +106,7 @@ export async function createPackage (
     }));
 
     const templatesDir = config.getTemplatesDirectory();
+    if (!templatesDir) throw new TypeError(`Failed to read templatesDir: ${templatesDir}`);
 
     // Create directories
     directories.forEach((item: string) => {
@@ -178,10 +190,13 @@ export async function createPackage (
     await GitUtils.addFiles([ "." ]);
 
     LOG.debug(`Initial git commit`);
-    await GitUtils.commit(config.getGitCommitMessage());
+    const commitMessage = config.getGitCommitMessage();
+    if (!commitMessage) throw new TypeError(`Failed to read commit message: ${commitMessage}`);
+    await GitUtils.commit(commitMessage);
 
     // Rename git branch
     const gitBranch = config.getGitBranch();
+    if (!gitBranch) throw new TypeError(`Failed to read git branch: ${gitBranch}`);
     LOG.debug(`Renaming main git branch to '${gitBranch}'`);
     await GitUtils.renameMainBranch(gitBranch);
 

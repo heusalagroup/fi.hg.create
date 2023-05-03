@@ -39,9 +39,14 @@ export class CreatePackageConfig {
     private _renameFiles            : {readonly [key: string]: string};
     private _gitSubmodules          : readonly GitSubmoduleConfig[];
     private _packages               : readonly string[];
-    private _packageJsonModifier    : PackageJsonModifyCallback;
+    private _packageJsonModifier    : PackageJsonModifyCallback | undefined;
 
     public constructor () {
+        this._files = [];
+        this._renameFiles = {};
+        this._gitSubmodules = [];
+        this._packages = [];
+        this._packageJsonModifier = undefined;
     }
 
     public static createFromTemplateFile (templateConfigFile : string) : CreatePackageConfig {
@@ -228,7 +233,10 @@ export class CreatePackageConfig {
     }
 
     public getDistFile () : string {
-        return this._distFile ?? pathJoin(this.getBuildDir(), `${this.getMainName()}.js`);
+        if (this._distFile) return this._distFile;
+        const buildDir = this.getBuildDir();
+        if (!buildDir) throw new TypeError(`No buildDir defined`);
+        return pathJoin(buildDir, `${this.getMainName()}.js`);
     }
 
 
@@ -238,7 +246,10 @@ export class CreatePackageConfig {
     }
 
     public getMainSourceFileName () : string {
-        return this._mainSrcFileName ?? pathJoin(this.getSourceDir(), `${this.getMainName()}.ts`);
+        if (this._mainSrcFileName) return this._mainSrcFileName;
+        const sourceDir = this.getSourceDir();
+        if (!sourceDir) throw new TypeError(`No sourceDir defined`);
+        return pathJoin(sourceDir, `${this.getMainName()}.ts`);
     }
 
 
@@ -248,7 +259,10 @@ export class CreatePackageConfig {
     }
 
     public getMainSourceFileTemplate () : string {
-        return this._mainSrcFileTemplate ?? pathJoin(this.getSourceDir(), `${this.getMainName()}.ts`);
+        if (this._mainSrcFileTemplate) return this._mainSrcFileTemplate;
+        const sourceDir = this.getSourceDir();
+        if (!sourceDir) throw new TypeError(`No sourceDir defined`);
+        return pathJoin(sourceDir, `${this.getMainName()}.ts`);
     }
 
 
@@ -298,6 +312,7 @@ export class CreatePackageConfig {
     }
 
     public getPackageJsonModifier () : PackageJsonModifyCallback {
+        if (!this._packageJsonModifier) throw new TypeError(`The packageJsonModifier not initialized yet`);
         return this._packageJsonModifier;
     }
 
