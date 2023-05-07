@@ -4,10 +4,10 @@ import {
     resolve as pathResolve,
     dirname as pathDirname
 } from "path";
-import { execa } from "execa";
 import { SyncFileUtils } from "../core/SyncFileUtils";
 import { LogService } from "../core/LogService";
 import { isString } from "../core/types/String";
+import { SystemService } from "../core/SystemService";
 
 const LOG = LogService.createLogger('GitUtils');
 
@@ -129,15 +129,7 @@ export class GitUtils {
     private static async _git (
         args: string[]
     ): Promise<void> {
-
-        await execa(
-            'git',
-            args,
-            {
-                stdio: "inherit"
-            }
-        );
-
+        await SystemService.executeCommand('git', args);
     }
 
 }
