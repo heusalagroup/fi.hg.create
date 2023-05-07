@@ -15,6 +15,9 @@ export async function initPackage (pkgManager : PackageManagerType) : Promise<vo
     LOG.debug(`Executing: `, pkgManager, "init", ...args);
     await SystemService.executeCommand(
         pkgManager,
-        [ "init", ...args ]
+        [ "init", ...args ],
+        {
+            stdio: 'inherit'
+        }
     );
 }

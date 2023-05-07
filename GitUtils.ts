@@ -129,7 +129,7 @@ export class GitUtils {
     private static async _git (
         args: string[]
     ): Promise<void> {
-        await SystemService.executeCommand('git', args);
+        await SystemService.executeCommand('git', args, {stdio: 'inherit'});
     }
 
 }
