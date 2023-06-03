@@ -42,32 +42,39 @@ export class GitUtils {
 
     }
 
-    static async initGit () {
-
-        const currentGitDir = GitUtils.getGitDir(process.cwd());
-
+    static async initGit (
+        projectDir: string
+    ) : Promise<string> {
+        const currentGitDir = GitUtils.getGitDir(projectDir);
         if ( !currentGitDir ) {
             LOG.debug(`Creating git directory`);
             await GitUtils._git([ "init" ]);
+            return projectDir;
         } else {
-            LOG.warn(`Warning! Git directory already exists: `, currentGitDir);
+            LOG.debug(`Git directory already exists: `, currentGitDir);
+            return currentGitDir;
         }
-
     }
 
-    static async addFiles (filePath: string | string[]) {
+    static async addFiles (
+        filePath: string | string[],
+        projectPath: string
+    ) {
 
         const files = isString(filePath) ? [ filePath ] : filePath;
 
         LOG.debug(`addFiles: Adding files: `, filePath);
-        await GitUtils._git([ "add", ...files ]);
+        await GitUtils._git([ '-C', projectPath, "add", ...files ]);
 
     }
 
-    static async commit (message: string) {
+    static async commit (
+        message: string,
+        projectPath: string
+    ) {
 
         LOG.debug(`commit with: `, message);
-        await GitUtils._git([ "commit", '-m', message ]);
+        await GitUtils._git([ '-C', projectPath, "commit", '-m', message ]);
 
     }
 
@@ -76,11 +83,12 @@ export class GitUtils {
      * git branch -M main
      * @param newName
      */
-    static async renameMainBranch (newName: string) {
-
+    static async renameMainBranch (
+        newName: string,
+        projectPath: string
+    ) {
         LOG.debug(`rename branch: `, newName);
-        await GitUtils._git([ "branch", '-M', newName ]);
-
+        await GitUtils._git([ '-C', projectPath, "branch", '-M', newName ]);
     }
 
     static async addSubModule (
@@ -89,7 +97,7 @@ export class GitUtils {
         projectPath: string
     ) {
         if ( !SyncFileUtils.fileExists(modulePath) ) {
-            await GitUtils._git([ "submodule", 'add', '-C', projectPath, moduleUrl, relativePath( projectPath, modulePath ) ]);
+            await GitUtils._git([ '-C', projectPath, "submodule", 'add', moduleUrl, relativePath( projectPath, modulePath ) ]);
         } else {
             LOG.warn(`Warning! Git sub module directory already exists: `, modulePath);
         }
@@ -100,9 +108,8 @@ export class GitUtils {
         moduleBranch: string,
         projectPath: string
     ) {
-
         await GitUtils._git(
-            [ "config", '-f', '.gitmodules', `submodule.${relativePath( projectPath, modulePath )}.branch`, moduleBranch ]);
+            [ '-C', projectPath, "config", '-f', '.gitmodules', `submodule.${relativePath( projectPath, modulePath )}.branch`, moduleBranch ]);
     }
 
     static async initSubModule (

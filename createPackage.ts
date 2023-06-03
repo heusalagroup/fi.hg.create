@@ -117,7 +117,12 @@ export async function createPackage (
 
     // Initialize git
     LOG.debug(`Initializing git if necessary`);
-    await GitUtils.initGit();
+    const projectDir = pathResolve( process.cwd() );
+
+    const gitDir = await GitUtils.initGit( projectDir );
+    if ( gitDir !== projectDir ) {
+        LOG.debug(`Git directory was already created in parent: `, gitDir);
+    }
 
     // Copy files
     files.forEach((item: string) => {
@@ -172,9 +177,9 @@ export async function createPackage (
                 `Initializing core git submodule from ${url} and branch ${branch} to ${path}`);
             await GitUtils.initSubModule(
                 url,
-                pathResolve('.', path),
+                pathResolve(projectDir, path),
                 branch ?? 'main',
-                pathResolve('.')
+                pathResolve(gitDir)
             );
 
         },
@@ -188,17 +193,17 @@ export async function createPackage (
 
     // Add files to git
     LOG.debug(`Adding files to git`);
-    await GitUtils.addFiles([ "." ]);
+    await GitUtils.addFiles([ "." ], projectDir);
 
     LOG.debug(`Initial git commit`);
     const commitMessage = config.getGitCommitMessage();
     if (!commitMessage) throw new TypeError(`Failed to read commit message: ${commitMessage}`);
-    await GitUtils.commit(commitMessage);
+    await GitUtils.commit(commitMessage, projectDir);
 
     // Rename git branch
     const gitBranch = config.getGitBranch();
     if (!gitBranch) throw new TypeError(`Failed to read git branch: ${gitBranch}`);
     LOG.debug(`Renaming main git branch to '${gitBranch}'`);
-    await GitUtils.renameMainBranch(gitBranch);
+    await GitUtils.renameMainBranch(gitBranch, gitDir);
 
 }
