@@ -1,4 +1,4 @@
-// Copyright (c) 2022. Heusala Group Oy <info@heusalagroup.fi>. All rights reserved.
+// Copyright (c) 2022-2023. Heusala Group Oy <info@heusalagroup.fi>. All rights reserved.
 
 import { CreatePackageConfig } from "./types/CreatePackageConfig";
 import {
@@ -173,7 +173,8 @@ export async function createPackage (
             await GitUtils.initSubModule(
                 url,
                 pathResolve('.', path),
-                branch ?? 'main'
+                branch ?? 'main',
+                pathResolve('.')
             );
 
         },

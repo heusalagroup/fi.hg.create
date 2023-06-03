@@ -2,7 +2,8 @@
 
 import {
     resolve as pathResolve,
-    dirname as pathDirname
+    dirname as pathDirname,
+    relative as relativePath
 } from "path";
 import { SyncFileUtils } from "../core/SyncFileUtils";
 import { LogService } from "../core/LogService";
@@ -84,30 +85,32 @@ export class GitUtils {
 
     static async addSubModule (
         moduleUrl: string,
-        modulePath: string
+        modulePath: string,
+        projectPath: string
     ) {
-
         if ( !SyncFileUtils.fileExists(modulePath) ) {
-            await GitUtils._git([ "submodule", 'add', moduleUrl, modulePath ]);
+            await GitUtils._git([ "submodule", 'add', '-C', projectPath, moduleUrl, relativePath( projectPath, modulePath ) ]);
         } else {
             LOG.warn(`Warning! Git sub module directory already exists: `, modulePath);
         }
-
     }
 
     static async setSubModuleBranch (
         modulePath: string,
-        moduleBranch: string
+        moduleBranch: string,
+        projectPath: string
     ) {
+
         await GitUtils._git(
-            [ "config", '-f', '.gitmodules', `submodule.${modulePath}.branch`, moduleBranch ]);
+            [ "config", '-f', '.gitmodules', `submodule.${relativePath( projectPath, modulePath )}.branch`, moduleBranch ]);
     }
 
     static async initSubModule (
-        moduleUrl: string,
-        modulePath: string,
-        moduleBranch: string
-    ) {
+        moduleUrl    : string,
+        modulePath   : string,
+        moduleBranch : string,
+        projectPath  : string
+    ) : Promise<void> {
 
         const parentPath = pathDirname(modulePath);
 
@@ -117,12 +120,12 @@ export class GitUtils {
 
         // git submodule add git@github.com:sendanor/typescript.git src/fi/hg/ts
         LOG.debug(`initSubModule: Adding submodule: `, moduleUrl, modulePath);
-        await GitUtils.addSubModule(moduleUrl, modulePath);
+        await GitUtils.addSubModule(moduleUrl, modulePath, projectPath);
 
         // git config -f .gitmodules submodule.src/fi/hg/ts.branch main
         LOG.debug(
             `initSubModule: Configuring branch for `, moduleUrl, modulePath, ': ', moduleBranch);
-        await GitUtils.setSubModuleBranch(modulePath, moduleBranch);
+        await GitUtils.setSubModuleBranch(modulePath, moduleBranch, projectPath);
 
     }
 
